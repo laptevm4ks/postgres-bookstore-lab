@@ -48,3 +48,13 @@ BEGIN
  RETURN l_author_id;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION buy_book(IN i_book_id INT)
+RETURNS VOID
+LANGUAGE plpgsql
+AS $$
+BEGIN
+ INSERT INTO operations(book_id, qty_change)
+ VALUES (i_book_id, -1);
+END;
+$$;
