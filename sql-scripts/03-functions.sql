@@ -12,3 +12,12 @@ BEGIN ATOMIC
  JOIN authors a USING (author_id)
  WHERE ash.book_id = i_book_id;
 END;
+
+CREATE OR REPLACE FUNCTION onhand_qty(IN i_book books)
+RETURNS INT
+LANGUAGE sql STABLE
+BEGIN ATOMIC
+ SELECT COALESCE(SUM(qty_change), 0)::int
+ FROM operations
+ WHERE book_id = i_book.book_id;
+END; 

@@ -6,9 +6,10 @@ FROM authors;
 
 CREATE VIEW catalog_v AS
 SELECT
- book_id,
- book_name(book_id, title) AS display_name
-FROM books;
+ b.book_id,
+ book_name(b.book_id, b.title) AS display_name,
+ onhand_qty(b) AS onhand
+FROM books b;
 
 CREATE VIEW operations_v AS
 SELECT
