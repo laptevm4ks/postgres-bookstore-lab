@@ -33,3 +33,18 @@ BEGIN ATOMIC
  FROM operations
  WHERE book_id = i_book.book_id;
 END; 
+
+CREATE OR REPLACE FUNCTION add_author(IN i_last_name TEXT, IN i_first_name TEXT, IN i_middle_name TEXT)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+ l_author_id INT;
+BEGIN
+ INSERT INTO authors(last_name, first_name, middle_name)
+ VALUES (i_last_name, i_first_name, i_middle_name)
+ RETURNING author_id INTO l_author_id;
+ 
+ RETURN l_author_id;
+END;
+$$;
