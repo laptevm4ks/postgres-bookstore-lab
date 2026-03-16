@@ -21,7 +21,8 @@ CREATE TABLE authors(
  author_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
  last_name TEXT NOT NULL,
  first_name TEXT NOT NULL,
- middle_name TEXT
+ middle_name TEXT,
+ CONSTRAINT unique_author_name UNIQUE NULLS NOT DISTINCT (last_name, first_name, middle_name)
 );
 
 CREATE TABLE authorship(
