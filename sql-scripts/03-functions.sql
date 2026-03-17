@@ -8,20 +8,31 @@ RETURNS TEXT STABLE
 LANGUAGE plpgsql
 AS $$
 DECLARE
- full_str TEXT;
- limit_len INT := 45;
+ r RECORD;
+ authors_str TEXT := '';
+ counter INT := 0;
 BEGIN
- SELECT i_title || '(Authors: ' || STRING_AGG(author_name(a.last_name, a.first_name, a.middle_name), ', ' ORDER BY ash.seq_num) || ')'
- INTO full_str
- FROM authorship ash
- JOIN authors a USING (author_id)
- WHERE ash.book_id = i_book_id;
+ FOR r IN (
+        SELECT author_name(a.last_name, a.first_name, a.middle_name) as name
+        FROM authorship ash
+        JOIN authors a USING (author_id)
+        WHERE ash.book_id = i_book_id
+        ORDER BY ash.seq_num
+        LIMIT 3
+    ) LOOP
+        counter := counter + 1;
 
-IF length(full_str) <= limit_len THEN
-        RETURN full_str;
-    END IF;
+        IF counter = 1 THEN
+            authors_str := r.name;
+        ELSIF counter = 2 THEN
+            authors_str := authors_str || ', ' || r.name;
+        ELSIF counter = 3 THEN
+            authors_str := authors_str || ' и др.';
+	EXIT;
+        END IF;
+    END LOOP;
 
-    RETURN regexp_replace(LEFT(full_str, limit_len), ' [^ ]*$', '') || '...';
+ RETURN i_title || ' (Авторы: ' || authors_str || ')';
 END;
 $$;
 
