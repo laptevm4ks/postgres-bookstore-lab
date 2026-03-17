@@ -112,5 +112,9 @@ BEGIN
  END LOOP;
 
  RETURN l_book_id;
+
+ EXCEPTION
+	WHEN unique_violation THEN
+	 RAISE EXCEPTION 'Error: the author must be unique';
 END;
 $$;
