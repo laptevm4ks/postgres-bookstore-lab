@@ -95,4 +95,22 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION add_book(IN i_title TEXT, IN i_authors_array INT[])
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+ counter INT := 0;
+ x INT;
+ l_book_id INT;
+BEGIN 
+ INSERT INTO books(title) VALUES (i_title) RETURNING book_id INTO l_book_id;
 
+ FOREACH x IN ARRAY i_authors_array LOOP
+	counter := counter + 1;
+	INSERT INTO authorship(book_id, author_id, seq_num) VALUES (l_book_id, x, counter);
+ END LOOP;
+
+ RETURN l_book_id;
+END;
+$$;
