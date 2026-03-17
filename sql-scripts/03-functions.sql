@@ -69,3 +69,30 @@ BEGIN
  VALUES (i_book_id, -1);
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION get_catalog(In i_book_name TEXT, IN i_author_name TEXT, IN i_in_stock BOOLEAN)
+RETURNS TABLE(display_name TEXT, onhand INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+ cmd TEXT := 'SELECT display_name, onhand FROM catalog_v WHERE TRUE';
+BEGIN
+ IF i_book_name IS NOT NULL THEN
+        cmd := cmd || format(' AND display_name ILIKE %L', '%' || i_book_name || '%');
+ END IF;
+
+ IF i_author_name IS NOT NULL THEN
+	cmd := cmd || format(' AND display_name ILIKE %L', '%' || i_author_name || '%');
+ END IF;
+
+ IF i_in_stock THEN
+	cmd := cmd || format(' AND onhand > 0');
+ ELSE
+	cmd := cmd || format(' AND onhand = 0');
+ END IF;
+
+ RETURN QUERY EXECUTE cmd;
+END;
+$$;
+
+
